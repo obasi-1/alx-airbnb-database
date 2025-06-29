@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,6 +15,7 @@
         - Key Indicators: Report Info -> Primary/Foreign Keys. Goal -> Inform. Viz/Method -> Unicode characters (🔑, 🔗) within the detail panel's attribute list. Interaction -> Static visual cues. Justification -> These are universally understood, lightweight icons that clearly denote an attribute's role without adding visual clutter. Library/Method -> HTML/CSS.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
