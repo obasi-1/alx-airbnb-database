@@ -111,7 +111,7 @@ ORDER BY
 --    accessed columns to speed up joins and filtering.
 -- 3. Filtering early (if applicable): If you only need a subset of data (e.g., bookings
 --    from a specific date range or by a specific user), add WHERE clauses.
---    (Not explicitly added here, but a common optimization strategy).
+--    (Now includes an example with AND for multiple conditions).
 -----------------------------------------------------------------------------
 SELECT
     b.booking_id,
@@ -130,6 +130,8 @@ INNER JOIN
 INNER JOIN
     payments AS pay ON b.booking_id = pay.booking_id
 WHERE
-    b.start_date >= '2023-01-01' -- Example: Add a filter to reduce result set size
+    b.start_date >= '2023-01-01' -- Example: First filter condition
+    AND pay.payment_status = 'completed' -- Example: Second filter condition using AND
 ORDER BY
     b.start_date DESC, b.booking_id; -- Order by a relevant indexed column
+
