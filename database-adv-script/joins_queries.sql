@@ -1,99 +1,86 @@
--- This database schema is assumed for the queries below.
---
--- Users Table:
---   user_id (PK)
---   user_name
---   email
---
--- Properties Table:
---   property_id (PK)
---   property_name
---   location
---
--- Bookings Table:
---   booking_id (PK)
---   user_id (FK to Users)
---   property_id (FK to Properties)
---   booking_date
---
--- Reviews Table:
---   review_id (PK)
---   property_id (FK to Properties)
---   user_id (FK to Users)
---   rating
---   comment
-
--- Query 1: INNER JOIN
--- Objective: Retrieve all bookings and the respective users who made them.
--- An INNER JOIN returns only the rows where the join condition is met in both tables.
--- In this case, it will only return bookings that have an associated user.
-
+---- Query 1: Retrieve all bookings and the respective users who made those bookings using INNER JOIN
+-- This query combines rows from the 'bookings' table with rows from the 'users' table
+-- where there is a match in the 'user_id' column in both tables.
+-- It will only return bookings that have a corresponding user, and users who have made bookings.
 SELECT
     b.booking_id,
-    b.booking_date,
+    b.property_id,
+    b.start_date,
+    b.end_date,
     u.user_id,
-    u.user_name,
+    u.username,
     u.email
 FROM
-    Bookings AS b
+    bookings AS b
 INNER JOIN
-    Users AS u ON b.user_id = u.user_id;
+    users AS u ON b.user_id = u.user_id;
 
--- Query 2: LEFT JOIN
--- Objective: Retrieve all properties and their reviews, including properties that have no reviews.
--- A LEFT JOIN returns all rows from the left table (Properties) and the matched rows from the right table (Reviews).
--- If there is no match, the columns from the right table will have NULL values.
-
+-- Query 2: Retrieve all properties and their reviews, including properties that have no reviews, using LEFT JOIN
+-- This query returns all rows from the 'properties' table (the "left" table)
+-- and the matching rows from the 'reviews' table (the "right" table).
+-- If there is no matching review for a property, the columns from the 'reviews' table will be NULL.
 SELECT
     p.property_id,
     p.property_name,
-    p.location,
+    p.address,
     r.review_id,
     r.rating,
-    r.comment
+    r.comment,
+    r.user_id AS reviewer_user_id
 FROM
-    Properties AS p
+    properties AS p
 LEFT JOIN
-    Reviews AS r ON p.property_id = r.property_id;
+    reviews AS r ON p.property_id = r.property_id;
 
--- Query 3: FULL OUTER JOIN
--- Objective: Retrieve all users and all bookings, including users without bookings and bookings without an assigned user.
--- A FULL OUTER JOIN returns all rows when there is a match in either the left (Users) or the right (Bookings) table.
--- It's useful for seeing all data from two tables, with NULLs in place where matches don't exist on either side.
--- Note: MySQL does not support FULL OUTER JOIN directly. You can emulate it using a UNION of a LEFT JOIN and a RIGHT JOIN.
--- The query below is standard SQL and works in databases like PostgreSQL and SQL Server.
-
-SELECT
-    u.user_id,
-    u.user_name,
-    b.booking_id,
-    b.booking_date
-FROM
-    Users AS u
-FULL OUTER JOIN
-    Bookings AS b ON u.user_id = b.user_id;
-
--- Emulation of FULL OUTER JOIN for MySQL:
+-- Query 3: Retrieve all users and all bookings, even if the user has no booking or a booking is not linked to a user, using FULL OUTER JOIN
+-- Note: FULL OUTER JOIN is not supported in all SQL databases (e.g., MySQL).
+-- If your database supports FULL OUTER JOIN (like PostgreSQL, SQL Server, Oracle), you can use the syntax below.
+-- This query returns all rows when there is a match in either the left (users) or right (bookings) table.
+-- Rows for which there is no match in the other table will have NULLs for the columns of the non-matching table.
 /*
 SELECT
     u.user_id,
-    u.user_name,
+    u.username,
+    u.email,
     b.booking_id,
-    b.booking_date
+    b.property_id,
+    b.start_date,
+    b.end_date
 FROM
-    Users u
-LEFT JOIN
-    Bookings b ON u.user_id = b.user_id
-UNION
+    users AS u
+FULL OUTER JOIN
+    bookings AS b ON u.user_id = b.user_id;
+*/
+
+-- Alternative for databases that do not support FULL OUTER JOIN directly (e.g., MySQL):
+-- This simulates a FULL OUTER JOIN by combining a LEFT JOIN and a RIGHT JOIN using UNION ALL.
+-- The LEFT JOIN gets all users and their bookings (or NULLs if no booking).
+-- The RIGHT JOIN gets all bookings and their users (or NULLs if no user),
+-- and then filters out rows that were already included by the LEFT JOIN to avoid duplicates.
 SELECT
     u.user_id,
-    u.user_name,
+    u.username,
+    u.email,
     b.booking_id,
-    b.booking_date
+    b.property_id,
+    b.start_date,
+    b.end_date
 FROM
-    Users u
+    users AS u
+LEFT JOIN
+    bookings AS b ON u.user_id = b.user_id
+UNION ALL
+SELECT
+    u.user_id,
+    u.username,
+    u.email,
+    b.booking_id,
+    b.property_id,
+    b.start_date,
+    b.end_date
+FROM
+    users AS u
 RIGHT JOIN
-    Bookings b ON u.user_id = b.user_id
+    bookings AS b ON u.user_id = b.user_id
 WHERE
-    u.user_id IS NULL;
-*/
+    u.user_id IS NULL; -- This condition ensures we only pick up bookings not linked to any user from the RIGHT JOIN part
