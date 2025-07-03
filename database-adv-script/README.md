@@ -158,3 +158,46 @@ Ensure the tables are populated with relevant data.
 Run the queries from the subqueries.sql file in a SQL client connected to your database.
 
 Examine the output of each query to understand the difference in how non-correlated and correlated subqueries are processed and the results they produce.
+
+
+**Advanced SQL Aggregations and Window Functions**
+
+This directory contains SQL scripts demonstrating the use of aggregation functions and window functions for data analysis within a database context, specifically tailored for an Airbnb-like dataset.
+
+aggregations_and_window_functions.sql
+
+This file contains two primary SQL queries designed to extract meaningful insights from booking and property data:
+
+**Query 1:** Total Bookings by User
+
+**Objective:** To determine the total number of bookings made by each individual user.
+
+**Description:**
+
+This query utilizes the COUNT() aggregation function in conjunction with the GROUP BY clause. It groups all booking records by user_id and then counts the booking_id for each group, providing a sum of bookings per user.
+
+**Example Use Case:**
+
+Understanding user engagement, identifying top bookers, or analyzing user behavior patterns.
+
+**Query 2:** Property Ranking by Total Bookings
+
+**Objective:** To rank properties based on the total number of bookings they have received.
+
+**Description:**
+
+This query employs a Common Table Expression (CTE) named PropertyBookings to first calculate the total number of bookings for each property_id. Following this, it applies the RANK() window function over the total_property_bookings in descending order. The RANK() function assigns a unique rank to each property, handling ties by assigning the same rank to properties with an identical number of bookings and then skipping subsequent ranks.
+
+**Example Use Case:**
+
+Identifying the most popular properties, analyzing property performance, or informing marketing strategies.
+
+**How to Use:**
+
+To execute these queries, connect to your SQL database (e.g., MySQL, PostgreSQL, SQLite) where your bookings table (and potentially properties table, if you extend the queries) resides. Then, simply run the SQL statements provided in aggregations_and_window_functions.sql.
+
+**Prerequisites:**
+
+A SQL database with a bookings table containing at least booking_id, user_id, and property_id columns.
+
+Basic understanding of SQL.
